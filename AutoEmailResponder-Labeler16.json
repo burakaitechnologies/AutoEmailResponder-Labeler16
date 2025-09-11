@@ -1,0 +1,677 @@
+{
+  "name": "AutoEmailResponder-Labeler16",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3e26d0b-6136-413a-b6d5-af2ea75aaaca",
+              "name": "message_id",
+              "value": "={{ $('Start: On New Email').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "540f6707-d57e-487b-811c-e1ed5b1fd6e5",
+              "name": "threadId",
+              "value": "={{ $('Start: On New Email').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "500fb0d7-544e-4ce9-ba58-e87773e1ddc6",
+              "name": "sender_body",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "41562146-828f-4139-a115-1ce4a10838a7",
+              "name": "subject",
+              "value": "={{ $('Start: On New Email').item.json.headers.subject.slice(9,) }}",
+              "type": "string"
+            },
+            {
+              "id": "59c3010b-7ffc-46e6-a3f5-a734ecb51d4e",
+              "name": "sender_name",
+              "value": "={{ $('Start: On New Email').item.json.from.value[0].name }}",
+              "type": "string"
+            },
+            {
+              "id": "948f8c24-e059-46a3-bbc7-ce27071ff126",
+              "name": "sender_email",
+              "value": "={{ $('Start: On New Email').item.json.from.value[0].address }}",
+              "type": "string"
+            },
+            {
+              "id": "4891ec5b-f606-4333-8382-4941d8ab15a3",
+              "name": "label_name_id_map",
+              "value": "={{ $('Filter Custom Gmail Labels').item.json.label_name_id_map }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3408,
+        -624
+      ],
+      "id": "b2552cf7-cee0-4e76-a0f0-c2830ce17fab",
+      "name": "Clean Data"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -4112,
+        -192
+      ],
+      "id": "60692eb6-7721-4342-a343-c1ba3eca195d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "VoHMb7O55rqzXqOK",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Clean Data').item.json.message_id }}",
+        "emailType": "text",
+        "message": "={{ $('Define Label and Draft Reply').item.json.output.reply_body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -3280,
+        -384
+      ],
+      "id": "79adf415-dc59-40d5-a931-3cf3e8367121",
+      "name": "Reply to a message",
+      "webhookId": "6cf1a6d9-2709-4a0f-a8c7-a704a27e3b30",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PbPIfh8yx3Mhezjz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        -4000,
+        -192
+      ],
+      "id": "8a0e4725-285e-4b78-8230-702f8b4c759b",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"label\": \"Product tutorials and learning resources\",\n  \"label_id\": \"Label_519762550547378834\",\n  \"reply_body\": \"Intro: Start with sender's name if valid, else use 'Hello,'.\\n\\nEmail Body: Write a short, polite reply to the request.\\n\\nClosing: End with receiver's name from Google Sheets if valid, else just 'Best Regards,'.\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -3728,
+        -192
+      ],
+      "id": "b58870db-3725-4517-ab2d-be488afa5b01",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1liPFisXRykljTLieBnbAW2azImCbWJVoY6hCB5a_2Ks",
+          "mode": "list",
+          "cachedResultName": "Form Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1liPFisXRykljTLieBnbAW2azImCbWJVoY6hCB5a_2Ks/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1liPFisXRykljTLieBnbAW2azImCbWJVoY6hCB5a_2Ks/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -3888,
+        -192
+      ],
+      "id": "24eea65c-fd9e-49aa-978e-3a342dd42e4e",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SHzE2FQJawAWxNLt",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -3680,
+        -576
+      ],
+      "id": "142c7d70-1d73-4cf0-9f66-0b6666549657",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "VoHMb7O55rqzXqOK",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -4224,
+        -656
+      ],
+      "id": "c45ab6af-4698-4b71-819a-72629a1de78c",
+      "name": "Start: On New Email",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PbPIfh8yx3Mhezjz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "label"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -4048,
+        -656
+      ],
+      "id": "fec1fe5f-08d8-4df6-9954-92f7302bec9d",
+      "name": "Fetch All Gmail Labels",
+      "webhookId": "fa444058-3fe9-4eda-a975-cc524ce8e357",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PbPIfh8yx3Mhezjz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# n8n Python Code Node - Extract Label IDs after index 14\n# This node processes Gmail labels\n\n# 1. Extract label names + ids after index 14 from input data (Get many labels node)\ninput_items = _input.all()\nlabel_map = {}\n\nfor item in input_items:\n    if 'json' in item and 'name' in item['json'] and 'id' in item['json']:\n        label_map[item['json']['name']] = item['json']['id']\n    elif 'name' in item and 'id' in item:\n        label_map[item['name']] = item['id']\n\n# Only keep entries after index 14\nnames_after_14 = list(label_map.keys())[14:] if len(label_map) > 14 else []\nids_after_14 = {name: label_map[name] for name in names_after_14 if name in label_map}\n\n# Return results\nreturn [{\n    'json': {\n        'label_name_id_map': ids_after_14\n    },\n    'pairedItem': {\n        'item': 0\n    }\n}]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3840,
+        -688
+      ],
+      "id": "77009075-57e3-4982-b08a-02ade0933ffd",
+      "name": "Filter Custom Gmail Labels"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are given a raw email body that may include long tracking links, repeated links, and unnecessary parameters. Your task is to clean the email body.\n\nRules:\n1. Keep all URLs, but remove tracking parameters (like utm_campaign, utm_source, etc.).\n2. If the same URL is repeated many times, keep only one clean version for that section.\n3. Keep the structure, headings, and important text the same.\n4. Present the final cleaned email body clearly formatted.\n\nRaw email: {{ $('Start: On New Email').item.json.text }}\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an AI email cleaner.  \nYour job is to take messy raw email bodies and output a clean, professional version.  \n- Keep all URLs, but clean them by removing unnecessary tracking parameters.  \n- Do not delete URLs.  \n- If a URL repeats in the same context, show only one clean version.  \n- Do not add or invent new content.  \n- Always output only the cleaned email body, nothing else.  "
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -3680,
+        -688
+      ],
+      "id": "f2d5e27d-1d65-4b5e-a03e-dc625cc87eda",
+      "name": "Clean Email Body Text"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -4224,
+        -384
+      ],
+      "id": "de8a9648-bba1-4af8-9603-740edc47c8fe",
+      "name": "Combine Feed Back Data"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Use the data below. Do the tasks in order.\n\n{\n  \"labels\": {{ $('Clean Data').item.json.label_name_id_map }},\n  \"sender subject\": \"{{ $('Clean Data').item.json.subject }}\",\n  \"sender body\": \"{{ $('Clean Data').item.json.sender_body }}\",\n  \"sender name\": \"{{ $('Clean Data').item.json.sender_name }}\",\n  \"human feedback\": \"{{ $json.data['Provide Feedback If Needed'] }}\"\n}\n\nTasks:\n1) Pick exactly ONE best label from \"labels\".  \n2) Use the Think Tool before acting to reason step by step and decide clearly on the label and reply direction.  \n3) Before writing the reply, always check Google Sheets – Get Row(s) for receiver information only (not sender).  \n   - Build a simple query from any receiver clues (email domain, company, ID, customer number, etc.).  \n   - If many rows return: prefer exact email match; else name+company; else first high-confidence row.  \n   - If no good match, continue without sheet data.  \n4) Write a short, professional reply body. Personalize it with any safe receiver info from the sheet (e.g., their plan/tier, account status, last order, ticket ID). Do not confuse this with the sender. Do not invent facts.  \n5) The reply intro must:  \n   - Start with \"Dear {{ $('Clean Data').item.json.sender_name }},\" if `sender_name` is valid.  \n   - Otherwise, start with \"Hello,\".  \n6) If \"human_feedback\" exists, adjust the reply to follow it.  \n7) Return the answer only in the output format style described in the System Prompt (do not add extra text).",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an AI Email Assistant.\n\nGoals:\n- Classify the email with exactly ONE user label.\n- Draft a clear, professional reply.\n- Use tools to improve accuracy and personalization.\n\nTools & Rules:\n- Gmail Tool: apply exactly ONE chosen label.  \n- Google Sheets – Get Row(s): only for **receiver data** (not sender). Use clues like email domain, company, or account ID to look up receiver details. Never treat sheet data as sender data.  \n- Think Tool: always use this before you act. Reason step by step on label choice and reply content.  \n- Structured Output Parser: final output must be valid JSON only.  \n- The reply intro must start with \"Dear {{ $('Clean Data').item.json.sender_name }},\" if sender_name is valid; otherwise \"Hello,\".  \n- If `human_feedback` is present, follow it even if it changes tone or content.  \n- Never add new fields. Never leak raw sheet data that feels private; use only what helps the reply.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -4048,
+        -384
+      ],
+      "id": "de23f1df-d5d1-427e-9c07-f39e341ab9dd",
+      "name": "Define Label and Draft Reply"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "aca8246e-f4e6-4b34-bd10-585abbcaeba1",
+              "leftValue": "={{ $json.data['Send it?'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3520,
+        -192
+      ],
+      "id": "4042d2c4-fc87-4f57-be49-5445ba5831bf",
+      "name": "Check Human Approval to Send"
+    },
+    {
+      "parameters": {
+        "content": "### Receive Email, Gather Labels\n",
+        "height": 272,
+        "width": 352,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4256,
+        -736
+      ],
+      "typeVersion": 1,
+      "id": "0bf82d32-a332-4ad6-b13e-9bcb8010b86f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "### AI Drafts Reply, Suggests Label\n",
+        "height": 416,
+        "width": 656,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4256,
+        -432
+      ],
+      "typeVersion": 1,
+      "id": "d7f3bdfc-a762-459b-9c83-b09c60e1c7a7",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "### Prepare Data for AI\n",
+        "height": 272,
+        "width": 608,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3888,
+        -736
+      ],
+      "typeVersion": 1,
+      "id": "0dc4c273-c61d-4f5c-8bbf-e208276880c5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "### Human Review, Approval\n",
+        "height": 416,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3584,
+        -432
+      ],
+      "typeVersion": 1,
+      "id": "4ca498f2-d802-4fa7-810c-d384d57edcf7",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "### Send, Label Email\n",
+        "height": 416,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3344,
+        -432
+      ],
+      "typeVersion": 1,
+      "id": "66b66ee4-19cf-422c-b4aa-70e4b6e24d55",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Clean Data').item.json.message_id }}",
+        "labelIds": "={{ $('Define Label and Draft Reply').item.json.output.label_id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -3280,
+        -192
+      ],
+      "id": "6cca8f10-3fa1-475e-9d62-c38d53758db7",
+      "name": "Add label to message",
+      "webhookId": "bdafa15d-7fc6-4a36-acd2-05198dac05c6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PbPIfh8yx3Mhezjz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "7582685911",
+        "message": "=Sender Name: {{ $('Clean Data').item.json.sender_name }}\nSender Email: {{ $('Clean Data').item.json.sender_email }}\nSender Subject: {{ $('Clean Data').item.json.subject }}\nAI Labeling: {{ $json.output.label }}\nAI Answer: {{ $json.output.reply_body }}\n\n\n\n\n\n\nRecieved Email Body:\n{{ $('Clean Data').item.json.sender_body }}",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Send it?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Provide Feedback If Needed",
+              "placeholder": "Write your feedback here..."
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -3520,
+        -384
+      ],
+      "id": "6430627a-ccb9-4873-a396-06bf975ee677",
+      "name": "Send for Human Review",
+      "webhookId": "400e61cf-e66c-4a14-a834-e46620455aeb",
+      "credentials": {
+        "telegramApi": {
+          "id": "1lEQISJR3mMraKtf",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Clean Data": {
+      "main": [
+        [
+          {
+            "node": "Combine Feed Back Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Define Label and Draft Reply",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Define Label and Draft Reply",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Define Label and Draft Reply",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "Define Label and Draft Reply",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Clean Email Body Text",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start: On New Email": {
+      "main": [
+        [
+          {
+            "node": "Fetch All Gmail Labels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch All Gmail Labels": {
+      "main": [
+        [
+          {
+            "node": "Filter Custom Gmail Labels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Custom Gmail Labels": {
+      "main": [
+        [
+          {
+            "node": "Clean Email Body Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Email Body Text": {
+      "main": [
+        [
+          {
+            "node": "Clean Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Feed Back Data": {
+      "main": [
+        [
+          {
+            "node": "Define Label and Draft Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Label and Draft Reply": {
+      "main": [
+        [
+          {
+            "node": "Send for Human Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Human Approval to Send": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Combine Feed Back Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Send for Human Review": {
+      "main": [
+        [
+          {
+            "node": "Check Human Approval to Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4e900fab-4a48-4d4f-a4e0-9a59ba9803c5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4a2952d750233c02800975f682ffd82d00294fb62c8e98c152bd79f86550ccf2"
+  },
+  "id": "KX2oOl3CJMhturOW",
+  "tags": []
+}
